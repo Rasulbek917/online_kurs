@@ -39,7 +39,7 @@ Vercel `manage.py` va `config.settings.WSGI_APPLICATION` orqali Django loyihasin
 3. Vercel **Settings → Environment Variables** bo‘limida quyidagini Production uchun kiriting (Preview uchun ham kerak bo‘lsa alohida belgilang):
    - `DJANGO_SECRET_KEY` — tasodifiy, maxfiy Django kaliti.
    - `ALLOWED_HOSTS` va `CSRF_TRUSTED_ORIGINS` — ixtiyoriy custom domen uchun, masalan `ALLOWED_HOSTS=example.com,www.example.com` va `CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com`. `.vercel.app` domenlari odatiy holatda ruxsat etiladi.
-4. Git’ga push qiling va avtomatik Vercel deploymentni kuting. Environment variable qo‘shilgan yoki o‘zgargan bo‘lsa, yangi deployment boshlang.
-5. Saytni ishlatishdan oldin production bazasida `python manage.py migrate` bajaring va `python manage.py createsuperuser` orqali admin yarating. Bu buyruqlarni Vercel Production environment’idan olingan DB ulanishi bilan ishonchli muhitdan bajaring; Vercel Function ishga tushganda migratsiyalar avtomatik bajarilmaydi.
+4. Git’ga push qiling va avtomatik Vercel deploymentni kuting. Production build davomida Django migratsiyalari avtomatik bajariladi.
+5. `python manage.py createsuperuser` buyrug‘ini Vercel Production environment’idan olingan DB ulanishi bilan ishonchli muhitda bajarib admin yarating.
 
 Vercel’dagi SQLite va lokal fayl tizimi doimiy emas: `.vercelignore` lokal `db.sqlite3`, `media/` va virtualenv’larni deploymentdan chiqaradi. Ishlab chiqarish ma’lumotlari PostgreSQL’da, yuklangan media esa Blob store’da saqlanadi. Blob store bu sozlamada public bo‘lgani uchun unga maxfiy yoki shaxsiy fayllarni yuklamang.
