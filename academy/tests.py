@@ -1,7 +1,36 @@
+import os
+from types import SimpleNamespace
+from unittest.mock import patch
 from django.test import TestCase
+from django.test import SimpleTestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.urls import reverse
 from .models import Category, Course, Lesson, LessonQuestion, LessonProgress, UserProfile
+from .storage_backends import VercelBlobStorage
+
+
+class VercelBlobStorageTests(SimpleTestCase):
+    @patch("academy.storage_backends.blob.put_blob")
+    def test_saves_with_public_blob_and_returns_path(self, put_blob):
+        put_blob.side_effect = lambda name, *args, **kwargs: SimpleNamespace(pathname=name)
+        storage = VercelBlobStorage()
+        upload = SimpleUploadedFile("lesson.mp4", b"video", content_type="video/mp4")
+
+        name = storage.save("lessons/videos/lesson.mp4", upload)
+
+        self.assertRegex(name, r"^lessons/videos/lesson_[a-zA-Z0-9]{8}\.mp4$")
+        put_blob.assert_called_once()
+        self.assertEqual(put_blob.call_args.kwargs["access"], "public")
+        self.assertEqual(put_blob.call_args.kwargs["content_type"], "video/mp4")
+
+    @patch.dict(os.environ, {"BLOB_STORE_ID": "store_test"})
+    def test_builds_public_blob_url(self):
+        storage = VercelBlobStorage()
+        self.assertEqual(
+            storage.url("lessons/videos/lesson one.mp4"),
+            "https://store_test.public.blob.vercel-storage.com/lessons/videos/lesson%20one.mp4",
+        )
 
 
 class PlatformTests(TestCase):

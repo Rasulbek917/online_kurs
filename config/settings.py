@@ -26,7 +26,12 @@ MIDDLEWARE = ["django.middleware.security.SecurityMiddleware", "django.contrib.s
 ROOT_URLCONF = "config.urls"
 TEMPLATES = [{"BACKEND":"django.template.backends.django.DjangoTemplates", "DIRS":[BASE_DIR / "templates"], "APP_DIRS":True, "OPTIONS":{"context_processors":["django.template.context_processors.request", "django.contrib.auth.context_processors.auth", "django.contrib.messages.context_processors.messages"]}}]
 WSGI_APPLICATION = "config.wsgi.application"
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = (
+    os.environ.get("DATABASE_URL")
+    or os.environ.get("DATABASE_URL_POOLED")
+    or os.environ.get("DATABASE_POSTGRES_URL")
+    or os.environ.get("DATABASE_PRISMA_DATABASE_URL")
+)
 if DATABASE_URL:
     import dj_database_url
     DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=ON_VERCEL)}
@@ -59,8 +64,13 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_S3_FILE_OVERWRITE = False
     AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = False
+elif ON_VERCEL and os.environ.get("BLOB_STORE_ID"):
+    STORAGES = {
+        "default": {"BACKEND": "academy.storage_backends.VercelBlobStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
 elif ON_VERCEL:
-    raise ImproperlyConfigured("Set AWS_STORAGE_BUCKET_NAME and S3 credentials for persistent media storage on Vercel.")
+    raise ImproperlyConfigured("Connect a Vercel Blob store for persistent media storage.")
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
