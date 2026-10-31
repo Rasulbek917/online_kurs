@@ -1,0 +1,27 @@
+{% extends 'academy/base.html' %}
+{% block title %}Ro‘yxatdan o‘tish — DarsHub{% endblock %}
+{% block content %}
+<section class="auth-page signup-page">
+  <div class="shell auth-layout signup-layout">
+    <aside class="auth-art-panel signup-art-panel">
+      <a class="auth-mini-brand" href="{% url 'home' %}"><span class="brand-mark">d<span>.</span></span><b>Dars<span>Hub</span></b></a>
+      <h1>O‘rganish<br>shu yerdan<br><span>boshlanadi.</span></h1>
+      <div class="signup-stage" aria-hidden="true"><div class="stage-ring stage-ring-one"></div><div class="stage-ring stage-ring-two"></div><div class="stage-card"><div class="stage-card-top"><i></i><i></i><i></i><span></span></div><div class="stage-card-main"><div class="stage-symbol"></div><div class="stage-lines"><i></i><i></i><i></i></div></div><div class="stage-card-bottom"><i></i><span></span></div></div><div class="stage-dot stage-dot-a"></div><div class="stage-dot stage-dot-b"></div><div class="stage-tile stage-tile-a"></div><div class="stage-tile stage-tile-b"></div></div>
+    </aside>
+    <div class="auth-form-panel signup-form-panel">
+      {% if role == 'teacher' %}<div class="eyebrow muted">O‘QITUVCHI HISOBI</div>{% endif %}
+      <h2>Ro‘yxatdan o‘tish</h2>
+      <p class="auth-intro">Ma’lumotlaringizni kiriting.</p>
+      {% if error %}<div class="auth-error">{{ error }}</div>{% endif %}
+      <form method="post" class="auth-form signup-form">
+        {% csrf_token %}<input type="hidden" name="role" value="{{ role }}">
+        <label><span class="signup-label">Foydalanuvchi nomi</span><span class="signup-input-wrap"><i>＠</i><input name="username" required autocomplete="username" placeholder="Foydalanuvchi nomi" value="{{ request.POST.username }}"></span></label>
+        <label><span class="signup-label">Parol</span><span class="signup-input-wrap"><i>⌑</i><input type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="Parol"></span><small class="signup-hint">Kamida 6 ta belgidan foydalaning.</small></label>
+        <button class="btn btn-primary auth-submit signup-submit" type="submit">Hisob yaratish <span>↗</span></button>
+      </form>
+      <div class="signup-login">Hisobingiz bormi? <a href="{% url 'login' %}">Kirish <span>→</span></a></div>
+      {% if role == 'student' %}<a class="signup-role-switch" href="{% url 'teacher_register' %}"><span class="signup-switch-icon">🎓</span><span><b>O‘qituvchimisiz?</b><small>O‘qituvchi sifatida ro‘yxatdan o‘ting</small></span><i>↗</i></a>{% else %}<a class="signup-role-switch" href="{% url 'register' %}"><span class="signup-switch-icon">📚</span><span><b>O‘quvchi sifatida hisob oching</b><small>O‘quvchi bo‘lib ro‘yxatdan o‘tish</small></span><i>↗</i></a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}DarsHub boshqaruv paneli{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'academy/admin.css' %}">{% endblock %}
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}"><span class="admin-brand-mark">d<span>.</span></span><span>Dars<span class="admin-brand-light">Hub</span><small>BOSHQARUV PANELI</small></span></a></div>
+{% endblock %}
+{% block nav-global %}<a class="admin-site-link" href="{% url 'home' %}" target="_blank">Saytni ko‘rish <span>↗</span></a>{% endblock %}

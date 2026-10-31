@@ -1,0 +1,16 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+{% block content %}
+<section class="admin-welcome">
+  <div class="welcome-icon">✦</div>
+  <div><span class="welcome-kicker">DARSHUB TA’LIM PLATFORMASI</span><h2>Kurslaringizni shu yerdan boshqaring</h2><p>Avval yo‘nalish yarating, keyin kurs oching va kurs ichiga dars hamda video qo‘shing.</p></div>
+</section>
+<div class="admin-steps">
+  <div><span>01</span><b>Yo‘nalish yarating</b><small>Masalan: Backend, Dizayn</small></div>
+  <i>→</i>
+  <div><span>02</span><b>Kurs qo‘shing</b><small>Nomi, tavsifi va rasmini kiriting</small></div>
+  <i>→</i>
+  <div><span>03</span><b>Dars va video qo‘shing</b><small>MP4 yuklang yoki video havolasini kiriting</small></div>
+</div>
+{{ block.super }}
+{% endblock %}
