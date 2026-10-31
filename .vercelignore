@@ -1,0 +1,7 @@
+.venv/
+venv/
+db.sqlite3
+media/
+.vercel_static/
+__pycache__/
+*.py[cod]

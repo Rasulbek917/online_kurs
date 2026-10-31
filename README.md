@@ -5,11 +5,10 @@ O‘zbek tilidagi onlayn kurslar platformasi. Django admin panelida yo‘nalish,
 ## Ishga tushirish
 
 ```bash
-cd online_dars
+cd online_teacher
 python3 -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python manage.py makemigrations academy
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
@@ -31,14 +30,21 @@ Jazzmin o‘rnatilmagan bo‘lsa, sayt standart Django admin panelidan foydalana
 
 Yuklangan rasmlar va videolar `media/` papkasida saqlanadi. Ishlab chiqarish muhitida `DEBUG=False`, kuchli maxfiy kalit, HTTPS, statik/media fayl saqlash va `ALLOWED_HOSTS` sozlamalarini yangilang.
 
-## Vercel
+## Vercel’ga deploy
 
-Vercel Django loyihasini `manage.py` orqali aniqlaydi va `STATIC_ROOT` sozlanganida statik fayllarni build vaqtida CDN’ga yig‘adi. Deploydan oldin Vercel’da quyidagi environment variable’larni sozlang:
+Vercel `manage.py` va `config.settings.WSGI_APPLICATION` orqali Django loyihasini aniqlaydi. `STATIC_ROOT` mavjudligi sababli static fayllar build vaqtida yig‘ilib CDN orqali beriladi; alohida `vercel.json` yoki `collectstatic` build buyrug‘i kerak emas.
 
-- `DJANGO_SECRET_KEY` — maxfiy, tasodifiy kalit
-- `DATABASE_URL` — doimiy PostgreSQL bazasiga ulanish manzili
-- `AWS_STORAGE_BUCKET_NAME`, `AWS_S3_ENDPOINT_URL`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` — video va yuklangan media uchun S3 mos ombor
-- `AWS_S3_REGION_NAME` — ombor hududi; R2 uchun odatda `auto`
-- `AWS_S3_CUSTOM_DOMAIN` — ixtiyoriy, ombor uchun ochiq CDN domeni
+1. GitHub’dagi repozitoriyani Vercel’da **Add New → Project** orqali import qiling. Root Directory loyiha ildizi bo‘lib qolsin; Python runtime `requirements.txt` dan bog‘liqliklarni o‘rnatadi.
+2. Doimiy PostgreSQL bazasini va S3-compatible media bucket’ni (masalan, Cloudflare R2) tayyorlang. Vercel **Settings → Environment Variables** bo‘limida quyidagilarni Production uchun kiriting (Preview uchun ham kerak bo‘lsa alohida belgilang):
+   - `DJANGO_SECRET_KEY` — tasodifiy, maxfiy Django kaliti.
+   - `DATABASE_URL` — PostgreSQL ulanish URL’i.
+   - `AWS_STORAGE_BUCKET_NAME` — media bucket nomi.
+   - `AWS_S3_ENDPOINT_URL` — S3 endpoint URL’i.
+   - `AWS_ACCESS_KEY_ID` va `AWS_SECRET_ACCESS_KEY` — bucket uchun maxfiy credentials.
+   - `AWS_S3_REGION_NAME` — R2 uchun `auto`; boshqa provider uchun uning region’i.
+   - `AWS_S3_CUSTOM_DOMAIN` — ixtiyoriy, media uchun ochiq CDN domeni.
+   - `ALLOWED_HOSTS` va `CSRF_TRUSTED_ORIGINS` — ixtiyoriy custom domen uchun, masalan `ALLOWED_HOSTS=example.com,www.example.com` va `CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com`. `.vercel.app` domenlari odatiy holatda ruxsat etiladi.
+3. **Deploy** qiling yoki Git’ga push qilib avtomatik deploymentni kuting. Environment variable qo‘shilgan yoki o‘zgargan bo‘lsa, yangi deployment boshlang.
+4. Saytni ishlatishdan oldin yuqoridagi production `DATABASE_URL` bilan `python manage.py migrate` bajaring va `python manage.py createsuperuser` orqali admin yarating. Bu buyruqlarni loyihani ishga tushiradigan ishonchli muhitdan bajaring; Vercel Function ishga tushganda migratsiyalar avtomatik bajarilmaydi.
 
-Vercel serverless muhitida SQLite va lokal `media/` fayllari doimiy saqlanmaydi. Shu sabab PostgreSQL hamda S3 mos media omborini ulang, so‘ng production bazasiga `python manage.py migrate` bajaring. Lokal `db.sqlite3` ishlab chiqarish bazasi sifatida ishlatilmaydi.
+Vercel’dagi SQLite va lokal fayl tizimi doimiy emas: `.vercelignore` lokal `db.sqlite3`, `media/` va virtualenv’larni deploymentdan chiqaradi. Ishlab chiqarish bazasi va yuklangan rasmlar/videolar PostgreSQL hamda S3-compatible bucket’da saqlanadi. Bucket fayllarni ommaviy o‘qishga ruxsat berishi yoki `AWS_S3_CUSTOM_DOMAIN` orqali ochiq CDN domeni sozlangan bo‘lishi kerak.
