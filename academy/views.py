@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django import forms
+import re
 from .models import Category, Course, Lesson, LessonQuestion
 from .models import UserProfile
 
@@ -21,12 +22,16 @@ def register(request, role="student"):
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "")
+        phone_number = request.POST.get("phone_number", "").strip()
+        digits = re.sub(r"\D", "", phone_number)
         if not username or len(password) < 6:
             error = "Ma’lumotlarni to‘g‘ri kiriting. Parol kamida 6 ta belgidan iborat bo‘lsin."
+        elif not re.fullmatch(r"[+\d()\-\s]{7,24}", phone_number) or len(digits) < 7:
+            error = "Telefon raqamini to‘g‘ri kiriting."
         elif User.objects.filter(username=username).exists(): error = "Bu foydalanuvchi nomi band."
         else:
             user = User.objects.create_user(username=username, password=password)
-            UserProfile.objects.create(user=user, role=role)
+            UserProfile.objects.create(user=user, role=role, phone_number=phone_number)
             login(request, user)
             return redirect("dashboard")
     return render(request, "academy/register.html", {"error": error, "role": role})
@@ -66,6 +71,8 @@ def _lesson_unlocked(lessons, lesson, completed):
     return not previous or str(previous[-1].pk) in completed
 
 def home(request):
+    if not request.user.is_authenticated:
+        return render(request, "academy/welcome.html")
     courses = Course.objects.filter(published=True).select_related("category").annotate(total_lessons=Count("lessons", filter=Q(lessons__published=True)))
     query = request.GET.get("q", "").strip()
     category = request.GET.get("category", "")
@@ -75,6 +82,7 @@ def home(request):
     featured = Course.objects.filter(published=True).select_related("category").first()
     return render(request, "academy/home.html", {"courses":courses, "categories":categories, "query":query, "active_category":category, "featured":featured})
 
+@login_required(login_url="login")
 def course_detail(request, slug):
     course = get_object_or_404(Course.objects.select_related("category"), slug=slug, published=True)
     lessons = course.lessons.filter(published=True)
@@ -84,6 +92,7 @@ def course_detail(request, slug):
     active_lesson = requested if requested in available else (available[0] if available else None)
     return render(request, "academy/course_detail.html", {"course":course, "lessons":lessons, "active_lesson":active_lesson, "completed_lessons":completed, "unlocked_ids":{item.pk for item in available}})
 
+@login_required(login_url="login")
 def lesson_quiz(request, slug, lesson_id):
     course = get_object_or_404(Course, slug=slug, published=True)
     lessons = course.lessons.filter(published=True).order_by("order", "id")

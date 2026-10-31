@@ -7,6 +7,7 @@ class UserProfile(models.Model):
     ROLE_CHOICES = [("student", "O‘quvchi"), ("teacher", "O‘qituvchi")]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     role = models.CharField("Hisob turi", max_length=10, choices=ROLE_CHOICES, default="student")
+    phone_number = models.CharField("Telefon raqami", max_length=24, blank=True, default="")
     def __str__(self): return f"{self.user.username} — {self.get_role_display()}"
 
 class Category(models.Model):

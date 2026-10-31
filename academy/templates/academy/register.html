@@ -16,11 +16,11 @@
       <form method="post" class="auth-form signup-form">
         {% csrf_token %}<input type="hidden" name="role" value="{{ role }}">
         <label><span class="signup-label">Foydalanuvchi nomi</span><span class="signup-input-wrap"><i>＠</i><input name="username" required autocomplete="username" placeholder="Foydalanuvchi nomi" value="{{ request.POST.username }}"></span></label>
+        <label><span class="signup-label">Telefon raqami</span><span class="signup-input-wrap"><i>☎</i><input type="tel" name="phone_number" required autocomplete="tel" inputmode="tel" placeholder="+998 90 123 45 67" value="{{ request.POST.phone_number }}"></span></label>
         <label><span class="signup-label">Parol</span><span class="signup-input-wrap"><i>⌑</i><input type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="Parol"></span><small class="signup-hint">Kamida 6 ta belgidan foydalaning.</small></label>
         <button class="btn btn-primary auth-submit signup-submit" type="submit">Hisob yaratish <span>↗</span></button>
       </form>
       <div class="signup-login">Hisobingiz bormi? <a href="{% url 'login' %}">Kirish <span>→</span></a></div>
-      {% if role == 'student' %}<a class="signup-role-switch" href="{% url 'teacher_register' %}"><span class="signup-switch-icon">🎓</span><span><b>O‘qituvchimisiz?</b><small>O‘qituvchi sifatida ro‘yxatdan o‘ting</small></span><i>↗</i></a>{% else %}<a class="signup-role-switch" href="{% url 'register' %}"><span class="signup-switch-icon">📚</span><span><b>O‘quvchi sifatida hisob oching</b><small>O‘quvchi bo‘lib ro‘yxatdan o‘tish</small></span><i>↗</i></a>{% endif %}
     </div>
   </div>
 </section>

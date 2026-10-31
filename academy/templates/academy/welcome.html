@@ -1,0 +1,32 @@
+{% extends 'academy/base.html' %}
+{% block title %}DarsHub — Kirish yoki ro‘yxatdan o‘tish{% endblock %}
+{% block content %}
+<section class="dashboard-hero welcome-hero">
+  <div class="hero-glow"></div>
+  <div class="shell dashboard-hero-inner">
+    <div class="dashboard-greeting">
+      <div class="eyebrow"><span class="pulse"></span> ONLAYN TA’LIM PLATFORMASI</div>
+      <h1>Bilim olishni<br><span>bugun boshlang.</span></h1>
+      <p>Kurslar va darslarni ko‘rish uchun hisobingizga kiring yoki yangi hisob yarating.</p>
+      <div class="welcome-actions">
+        <a class="btn btn-primary" href="{% url 'login' %}">Kirish <span>→</span></a>
+        <a class="btn welcome-secondary" href="{% url 'register' %}">Ro‘yxatdan o‘tish <span>↗</span></a>
+      </div>
+      <div class="welcome-note"><span>🔒</span> Kurslar hisobga kirgandan keyin ochiladi.</div>
+    </div>
+    <div class="dashboard-art">
+      <div class="art-orbit orbit-one"></div>
+      <div class="art-orbit orbit-two"></div>
+      <div class="dashboard-visual-card">
+        <div class="dashboard-visual-top"><span></span><span></span><span></span><i>DARSHUB</i></div>
+        <div class="dashboard-visual-icon">▤</div>
+        <div class="dashboard-visual-line wide"></div>
+        <div class="dashboard-visual-line"></div>
+        <div class="dashboard-visual-line short"></div>
+        <div class="dashboard-visual-progress"><i></i></div>
+      </div>
+      <div class="dashboard-float-mark">✳</div>
+    </div>
+  </div>
+</section>
+{% endblock %}
