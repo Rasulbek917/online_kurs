@@ -27,7 +27,8 @@ class LessonAdminForm(forms.ModelForm):
 class LessonInline(admin.StackedInline):
     model = Lesson
     form = LessonAdminForm
-    extra = 1
+    extra = 0
+    show_change_link = True
     fields = ("title", "description", "order", "duration", "video_file", "video_url", "published")
     verbose_name = "Dars"
     verbose_name_plural = "Kurs darslari — sarlavha va video shu yerda kiritiladi"
@@ -39,7 +40,8 @@ class LessonInline(admin.StackedInline):
 
 class LessonQuestionInline(admin.StackedInline):
     model = LessonQuestion
-    extra = 10
+    extra = 1
+    max_num = 10
     fields = ("order", "text", "image", ("option_a", "option_b"), ("option_c", "option_d"), "correct_option")
     verbose_name = "Test savoli"
     verbose_name_plural = "Darsdan keyingi test — 10 ta savol kiriting"
@@ -47,6 +49,7 @@ class LessonQuestionInline(admin.StackedInline):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "icon")
+    search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
     fields = ("name", "icon", "slug")
     help_texts = {"icon": "Yo‘nalish belgisi sifatida emoji kiriting. Masalan: 💻 yoki 🎨."}
@@ -54,6 +57,11 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("title", "category", "level", "published")
+    list_editable = ("published",)
+    list_select_related = ("category",)
+    autocomplete_fields = ("category",)
+    list_per_page = 25
+    save_on_top = True
     list_filter = ("category", "level", "published")
     search_fields = ("title", "description")
     prepopulated_fields = {"slug": ("title",)}
@@ -71,7 +79,20 @@ class CourseAdmin(admin.ModelAdmin):
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
     form = LessonAdminForm
-    list_display = ("title", "course", "order", "duration", "published")
+    list_display = ("title", "course", "order", "duration", "test_status", "published")
+    list_editable = ("order", "published")
+    list_select_related = ("course",)
+    autocomplete_fields = ("course",)
+    list_per_page = 25
+    save_on_top = True
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(question_total=Count("questions"))
+
+    @admin.display(description="Test tayyorligi")
+    def test_status(self, obj):
+        return f"{obj.question_total}/10 — " + ("Tayyor" if obj.question_total == 10 else "To‘ldirish kerak")
+
     list_filter = ("course", "published")
     search_fields = ("title", "course__title")
     ordering = ("course", "order")
@@ -81,3 +102,23 @@ class LessonAdmin(admin.ModelAdmin):
         ("Video", {"description": "Video faylni yuklang yoki YouTube/Vimeo havolasini kiriting. Ikkalasini bir vaqtda to‘ldirmang.", "fields": ("video_file", "video_url")} ),
         ("Sayt sozlamalari", {"fields": ("published",)} ),
     )
+
+from django.db.models import Count
+from .models import UserProfile, LessonProgress
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "role", "phone_number")
+    list_filter = ("role",)
+    search_fields = ("user__username", "phone_number")
+    autocomplete_fields = ("user",)
+    list_select_related = ("user",)
+
+@admin.register(LessonProgress)
+class LessonProgressAdmin(admin.ModelAdmin):
+    list_display = ("user", "lesson", "completed_at")
+    search_fields = ("user__username", "lesson__title")
+    list_filter = ("lesson__course", "completed_at")
+    list_select_related = ("user", "lesson", "lesson__course")
+    readonly_fields = ("completed_at",)
+    autocomplete_fields = ("user", "lesson")

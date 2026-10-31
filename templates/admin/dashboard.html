@@ -12,5 +12,11 @@
   <i>→</i>
   <div><span>03</span><b>Dars va video qo‘shing</b><small>MP4 yuklang yoki video havolasini kiriting</small></div>
 </div>
+<div class="admin-quicklinks">
+{% if perms.academy.add_course %}<a href="{% url 'admin:academy_course_add' %}">＋ Kurs yaratish</a>{% endif %}
+{% if perms.academy.add_lesson %}<a href="{% url 'admin:academy_lesson_add' %}">＋ Dars yaratish</a>{% endif %}
+{% if perms.academy.view_userprofile %}<a href="{% url 'admin:academy_userprofile_changelist' %}">O‘quvchilar va o‘qituvchilar</a>{% endif %}
+{% if perms.academy.view_lessonprogress %}<a href="{% url 'admin:academy_lessonprogress_changelist' %}">O‘quv natijalari</a>{% endif %}
+</div>
 {{ block.super }}
 {% endblock %}

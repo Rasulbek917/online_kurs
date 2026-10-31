@@ -5,9 +5,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django import forms
+from django.views.decorators.http import require_POST
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.db import transaction
 import re
 from .models import Category, Course, Lesson, LessonQuestion
-from .models import UserProfile
+from .models import UserProfile, LessonProgress
 
 class LessonCreateForm(forms.ModelForm):
     class Meta:
@@ -15,6 +18,7 @@ class LessonCreateForm(forms.ModelForm):
         fields = ("course", "title", "description", "order", "duration", "video_file", "video_url", "published")
         widgets = {"video_file": forms.FileInput(attrs={"accept": "video/*"}), "description": forms.Textarea(attrs={"rows": 4})}
 
+@transaction.atomic
 def register(request, role="student"):
     if request.user.is_authenticated: return redirect("dashboard")
     if role not in {"student", "teacher"}: role = "student"
@@ -24,7 +28,7 @@ def register(request, role="student"):
         password = request.POST.get("password", "")
         phone_number = request.POST.get("phone_number", "").strip()
         digits = re.sub(r"\D", "", phone_number)
-        if not username or len(password) < 6:
+        if not username or len(username) > 150 or len(password) < 6:
             error = "Ma’lumotlarni to‘g‘ri kiriting. Parol kamida 6 ta belgidan iborat bo‘lsin."
         elif not re.fullmatch(r"[+\d()\-\s]{7,24}", phone_number) or len(digits) < 7:
             error = "Telefon raqamini to‘g‘ri kiriting."
@@ -42,10 +46,14 @@ def user_login(request):
         user = authenticate(request, username=request.POST.get("username", "").strip(), password=request.POST.get("password", ""))
         if user:
             login(request, user)
+            target = request.GET.get("next", "")
+            if target and url_has_allowed_host_and_scheme(target, {request.get_host()}, require_https=request.is_secure()):
+                return redirect(target)
             return redirect("dashboard")
         error = "Foydalanuvchi nomi yoki parol noto‘g‘ri."
     return render(request, "academy/login.html", {"error": error})
 
+@require_POST
 def user_logout(request):
     logout(request)
     return redirect("home")
@@ -56,18 +64,21 @@ def dashboard(request):
     if request.method == "POST" and profile.role == "teacher":
         form = LessonCreateForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Dars muvaffaqiyatli qo‘shildi.")
+            lesson = form.save(commit=False)
+            if not request.user.has_perm("academy.add_lesson"):
+                lesson.published = False
+            lesson.save()
+            messages.success(request, "Dars saqlandi. Chop etish huquqi bo‘lmasa, administrator tasdig‘ini kutadi.")
             return redirect("dashboard")
     else: form = LessonCreateForm()
     return render(request, "academy/dashboard.html", {"profile": profile, "form": form})
 
 def _completed_lessons(request, course):
-    return set(request.session.get(f"completed_lessons_{course.pk}", []))
+    return set(str(pk) for pk in LessonProgress.objects.filter(user=request.user, lesson__course=course).values_list("lesson_id", flat=True))
 
 def _lesson_unlocked(lessons, lesson, completed):
     # For ties in the configured order, the preceding lesson is also a prerequisite.
-    previous = [item for item in lessons.order_by("order", "id") if (item.order, item.pk) < (lesson.order, lesson.pk)]
+    previous = [item for item in lessons if (item.order, item.pk) < (lesson.order, lesson.pk)]
     return not previous or str(previous[-1].pk) in completed
 
 def home(request):
@@ -85,11 +96,11 @@ def home(request):
 @login_required(login_url="login")
 def course_detail(request, slug):
     course = get_object_or_404(Course.objects.select_related("category"), slug=slug, published=True)
-    lessons = course.lessons.filter(published=True)
+    lessons = list(course.lessons.filter(published=True).order_by("order", "id"))
     completed = _completed_lessons(request, course)
-    available = [lesson for lesson in lessons.order_by("order", "id") if _lesson_unlocked(lessons, lesson, completed)]
-    requested = lessons.filter(pk=request.GET.get("lesson")).first() if request.GET.get("lesson", "").isdigit() else None
-    active_lesson = requested if requested in available else (available[0] if available else None)
+    available = [lesson for lesson in lessons if _lesson_unlocked(lessons, lesson, completed)]
+    requested = next((item for item in lessons if str(item.pk) == request.GET.get("lesson")), None)
+    active_lesson = requested if requested in available else (next((item for item in available if str(item.pk) not in completed), available[-1] if available else None))
     return render(request, "academy/course_detail.html", {"course":course, "lessons":lessons, "active_lesson":active_lesson, "completed_lessons":completed, "unlocked_ids":{item.pk for item in available}})
 
 @login_required(login_url="login")
@@ -113,6 +124,7 @@ def lesson_quiz(request, slug, lesson_id):
             score = sum(request.POST.get(f"question_{q.pk}") == q.correct_option for q in questions)
             passed = score >= 7
             if passed:
+                LessonProgress.objects.get_or_create(user=request.user, lesson=lesson)
                 completed.add(str(lesson.pk))
                 request.session[f"completed_lessons_{course.pk}"] = sorted(completed)
                 request.session.modified = True

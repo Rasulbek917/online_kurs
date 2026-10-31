@@ -120,3 +120,5 @@ a:hover {
 .register-box .card {
   border-top: 3px solid var(--dh-green);
 }
+
+.admin-quicklinks{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}.admin-quicklinks a{padding:12px 16px;background:#eef5e8;border:1px solid #b7c9aa;border-radius:8px;color:#334d27;font-weight:600}.admin-quicklinks a:hover{background:#dcebcf}@media(max-width:700px){.admin-steps{flex-wrap:wrap}.admin-steps>i{display:none}.admin-welcome{align-items:flex-start}.admin-site-link{position:static}#content{padding:20px 12px}}

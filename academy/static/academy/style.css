@@ -60,3 +60,63 @@
 
 /* Guest entry screen follows the dashboard hero layout. */
 .welcome-hero{min-height:calc(100vh - 76px);display:flex;align-items:center;padding:48px 0}.welcome-hero .dashboard-hero-inner{min-height:390px}.welcome-hero .dashboard-greeting h1{font-size:clamp(42px,5vw,58px)}.welcome-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:25px}.welcome-actions .btn{min-width:165px;gap:14px}.welcome-secondary{border:1px solid #355578;background:#0a2143;color:#eef5ff}.welcome-note{display:flex;align-items:center;gap:8px;margin-top:25px;color:#9fb3cc;font-size:10px}.welcome-note span{font-size:13px}.welcome-hero .dashboard-visual-icon{font-size:27px}@media(max-width:650px){.welcome-hero{min-height:calc(100vh - 64px);padding:36px 0 20px}.welcome-hero .dashboard-hero-inner{min-height:0}.welcome-hero .dashboard-greeting h1{font-size:40px}.welcome-actions{gap:9px}.welcome-actions .btn{min-width:0;flex:1;padding:13px 12px;font-size:10px}.welcome-note{margin-top:18px}.welcome-hero .dashboard-art{height:210px}}
+
+.logout-form{display:inline-flex;margin:0}.logout-form button{font:inherit;cursor:pointer} :focus-visible{outline:3px solid #75a747;outline-offset:3px}
+
+/* DarsHub palette: midnight blue, emerald accents and soft white text. */
+:root {
+  --page: #0b1220;
+  --surface: #121e30;
+  --surface-raised: #192940;
+  --line: #2b3d55;
+  --ink: #edf4fc;
+  --muted: #adbed2;
+  --accent: #5ee0b5;
+  --accent-hover: #8deccc;
+  --accent-ink: #082c24;
+  color-scheme: dark;
+}
+body,main{background:var(--page);color:var(--ink)}
+.topbar{background:#0b1220;border-bottom-color:var(--line);color:var(--ink)}
+.hero,.course-hero,.dashboard-hero{background:radial-gradient(ellipse at 80% 15%,#173b48 0,transparent 55%),var(--page)!important}
+.hero-glow{background:radial-gradient(circle,#38c9a024,transparent 68%)}
+.categories-section,.courses-section,.lesson-section,.quiz-section,.auth-page,.signup-page,.dashboard-section{background:var(--page)!important;color:var(--ink)}
+.courses-section{background:#0e1828!important}
+.auth-layout,.auth-form-panel,.signup-layout,.dashboard-card,.dashboard-card-head,.dashboard-sidecard,.student-welcome,.student-feature,.dashboard-shortcuts>a{background:var(--surface)!important;border-color:var(--line)}
+.auth-art-panel{background:linear-gradient(145deg,#152c3d,#102d30)!important}
+.auth-art-panel:before,.signup-art-panel:before{background:radial-gradient(ellipse at 70% 65%,#25695955,transparent 65%)}
+.bottom-cta,footer{background:#0a1723;color:var(--muted)}
+.course-card,.lesson-sidebar,.quiz-card,.question-card,.search-form,.category-chip,.signup-hint,.signup-role-switch,.auth-foot,.auth-panel-foot{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.course-card:hover{border-color:#467566;box-shadow:0 16px 40px #00000030}
+.category-chip:hover,.category-chip.selected,.lesson-row:hover,.lesson-row.active,.question-card label:hover{background:#193c39;border-color:#408b77}
+.category-chip small,.lesson-count,.duration-tag,.lesson-play{background:#20344a;color:#c7d9ea}
+.course-title,.section-heading h2,.sidebar-head h3,.lesson-row-title,.question-card legend,.question-card label,.dashboard-card-head h2,.dashboard-shortcuts b,.auth-form-panel h2,.signup-form-panel h2,.dashboard-section .dashboard-section-title h2{color:var(--ink)}
+.hero-text,.dashboard-hero p,.detail-head p,.lesson-description,.course-body>p,.course-meta,.course-heading p,.section-heading p,.auth-intro,.auth-card>p,.dashboard-card-head p,.dashboard-shortcuts small,.lesson-row-title small,.welcome-note,.empty-state p,.side-tip small{color:var(--muted)}
+.course-bottom,.sidebar-head,.back-link,.dashboard-card-head,.hero-bottom{border-color:var(--line)}
+.eyebrow,.hero h1 span,.dashboard-hero h1 span,.auth-art-panel h1 span,.signup-art-panel h1 span,.spark,.rating b,.code-lang,.cursor,.code-foot span:first-child,.detail-facts span:first-child,.student-feature-mark{color:var(--accent)}
+.eyebrow.muted,.section-heading .eyebrow.muted{color:#a0b5ce}
+.btn-primary,.btn-light,.brand-mark,.tag-icon,.visual-arrow,.video-empty>span,.lesson-row.active .lesson-play{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn-primary,.btn-light,.nav-cta,.category-chip{transition:background-color .2s,color .2s,border-color .2s,box-shadow .2s}
+.btn-primary:hover,.btn-light:hover{background:var(--accent-hover);color:var(--accent-ink);box-shadow:0 6px 24px #5ee0b526}
+.brand-mark span{color:#17634e}
+.pulse{background:var(--accent);box-shadow:0 0 14px #5ee0b560}
+@keyframes pulse-glow{50%{box-shadow:0 0 19px 4px #5ee0b533}}
+.auth-foot a,.course-bottom a,.course-meta span:first-child,.back-link,.dark-link span,.search-form button,.signup-role-switch a,.nav-links a:hover,.text-link:hover{color:#83e8c7}
+.nav-cta,.account-links>a,.welcome-secondary{background:#152238;border-color:#3b506b;color:var(--ink)}
+.nav-cta:hover,.account-links>a:hover,.welcome-secondary:hover{background:#20374a;border-color:var(--accent);color:#b6f5e1}
+.auth-form input,.auth-form select,.signup-input-wrap input,.signup-form input,.lesson-create-form input,.lesson-create-form textarea,.lesson-create-form select{background:#0c1726;border-color:#3d516b;color:var(--ink);accent-color:var(--accent)}
+.auth-form label,.lesson-create-form p,.signup-label{color:#dce8f6}
+.auth-form input::placeholder,.signup-input-wrap input::placeholder,.signup-form input::placeholder,.search-form input::placeholder{color:#9eafc5}
+.auth-form input:focus,.auth-form select:focus,.lesson-create-form textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #5ee0b51f;outline:none}
+.search-form:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px #5ee0b51f}
+.question-card input{accent-color:var(--accent)}
+.question-card label:has(input:checked){background:#1a423b;outline:1px solid #5ee0b5}
+.quiz-result.success,.auth-success{background:#163d32;color:#b4f4d9;border:1px solid #32795e}
+.quiz-result.retry{background:#3d3020;color:#ffe0a6}
+.quiz-error,.auth-error{background:#422735;color:#ffd5df}
+.dashboard-visual-card,.stage-card,.code-card{background:linear-gradient(145deg,#20354c,#142535);border-color:#3a566b}
+.dashboard-visual-icon,.dashboard-card-icon,.dashboard-shortcuts>a>span,.side-tip>span{background:#20463d;color:#8deccc}
+.student-book,.stage-symbol{background:linear-gradient(145deg,#8deccc,#36b58e);color:#103c30}
+.dashboard-visual-progress i,.stage-card-bottom i{background:var(--accent)}
+.student-feature-orbit,.art-orbit,.stage-ring{border-color:#5ee0b522}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}

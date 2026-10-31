@@ -59,6 +59,11 @@ class Lesson(models.Model):
         verbose_name_plural = "Darslar"
         ordering = ["order", "id"]
     def __str__(self): return f"{self.course.title} — {self.title}"
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.video_file and self.video_url:
+            raise ValidationError({"video_url": "Video fayl yoki havoladan faqat bittasini kiriting."})
+
     @property
     def embed_url(self):
         url = self.video_url
@@ -91,3 +96,12 @@ class LessonQuestion(models.Model):
 
     def __str__(self):
         return f"{self.lesson.title}: {self.text[:60]}"
+
+
+class LessonProgress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "lesson"], name="unique_user_lesson_progress")]
